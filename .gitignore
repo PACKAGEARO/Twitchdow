@@ -1,0 +1,7 @@
+node_modules/
+dist/
+resources/bin/
+build/icon.iconset/
+.DS_Store
+*.log
+.claude/
