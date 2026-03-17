@@ -2059,6 +2059,71 @@
     ::-webkit-scrollbar-thumb:hover { background: #4a4a6c; }
 
     /* ── Toast Notifications ──────────────────────────────────────── */
+    /* ── Update Banner ─────────────────────────────────────── */
+    .update-banner {
+      background: linear-gradient(135deg, rgba(100, 65, 185, 0.95), rgba(75, 45, 150, 0.95));
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .update-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .update-banner-content svg {
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
+    .update-banner-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .update-banner-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .update-banner-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .update-banner-dismiss {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+    }
+    .update-banner-dismiss:hover {
+      color: #fff;
+    }
+    .update-progress-bar {
+      height: 3px;
+      background: rgba(0,0,0,0.2);
+    }
+    .update-progress-fill {
+      height: 100%;
+      background: #9b59b6;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
     .toast-container {
       position: fixed;
       top: 20px;
@@ -2164,6 +2229,21 @@
 
   <!-- ── Main Content ─────────────────────────────────────────────── -->
   <div class="main">
+
+    <!-- UPDATE BANNER -->
+    <div id="updateBanner" class="update-banner" style="display:none;">
+      <div class="update-banner-content">
+        <svg viewBox="0 0 256 256" fill="currentColor" width="18" height="18"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg>
+        <span id="updateBannerText">A new version is available!</span>
+        <div class="update-banner-actions">
+          <button id="btnUpdateAction" class="update-banner-btn">Download Update</button>
+          <button id="btnUpdateDismiss" class="update-banner-dismiss">&times;</button>
+        </div>
+      </div>
+      <div id="updateProgressBar" class="update-progress-bar" style="display:none;">
+        <div id="updateProgressFill" class="update-progress-fill"></div>
+      </div>
+    </div>
 
     <!-- HOME PAGE -->
     <div id="page-home" class="page active">
@@ -2570,6 +2650,16 @@
           <div id="favoritesList" style="margin-top:12px;display:none;">
             <div style="font-size:12px;color:#6a6a8a;margin-bottom:8px;">Favorite Channels:</div>
             <div id="favoritesGrid" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-label">App Updates</div>
+          <div class="settings-desc" style="font-size:12px;color:#6a6a8a;margin-bottom:8px;">
+            Current version: <span id="appVersionText" style="color:#9a9ab0;">v1.0.0</span>
+          </div>
+          <div class="settings-row" style="align-items:center;gap:12px;">
+            <button class="btn-browse" id="btnCheckUpdates" style="min-width:160px;">Check for Updates</button>
+            <span id="updateStatusText" style="font-size:12px;color:#6a6a8a;"></span>
           </div>
         </div>
       </div>

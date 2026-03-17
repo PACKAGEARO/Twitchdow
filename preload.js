@@ -42,4 +42,13 @@ contextBridge.exposeInMainWorld('api', {
   getPlatform: () => process.platform,
   // System warnings
   onMissingBinaries: (callback) => ipcRenderer.on('missing-binaries', (event, data) => callback(data)),
+  // Auto-update
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+  onUpdateAvailable: (callback) => ipcRenderer.on('update-available', (event, data) => callback(data)),
+  onUpdateDownloadProgress: (callback) => ipcRenderer.on('update-download-progress', (event, data) => callback(data)),
+  onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', (event, data) => callback(data)),
+  onUpdateError: (callback) => ipcRenderer.on('update-error', (event, data) => callback(data)),
 });

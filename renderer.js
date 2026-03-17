@@ -43,6 +43,104 @@ window.api.onMissingBinaries((binaries) => {
   );
 });
 
+// ── Auto Update ──────────────────────────────────────────────────────────
+const updateBanner = document.getElementById('updateBanner');
+const updateBannerText = document.getElementById('updateBannerText');
+const btnUpdateAction = document.getElementById('btnUpdateAction');
+const btnUpdateDismiss = document.getElementById('btnUpdateDismiss');
+const updateProgressBar = document.getElementById('updateProgressBar');
+const updateProgressFill = document.getElementById('updateProgressFill');
+
+let updateState = 'idle'; // idle, available, downloading, ready
+
+window.api.onUpdateAvailable((data) => {
+  updateState = 'available';
+  updateBannerText.textContent = `Twitchdow v${data.version} is available!`;
+  btnUpdateAction.textContent = 'Download Update';
+  updateBanner.style.display = 'block';
+});
+
+window.api.onUpdateDownloadProgress((data) => {
+  updateProgressBar.style.display = 'block';
+  updateProgressFill.style.width = data.percent + '%';
+  btnUpdateAction.textContent = `Downloading... ${data.percent}%`;
+  btnUpdateAction.disabled = true;
+});
+
+window.api.onUpdateDownloaded(() => {
+  updateState = 'ready';
+  updateProgressBar.style.display = 'none';
+  updateBannerText.textContent = 'Update downloaded and ready to install!';
+  btnUpdateAction.textContent = 'Restart & Update';
+  btnUpdateAction.disabled = false;
+});
+
+window.api.onUpdateError((msg) => {
+  updateBanner.style.display = 'none';
+  updateState = 'idle';
+});
+
+btnUpdateAction.addEventListener('click', () => {
+  if (updateState === 'available') {
+    updateState = 'downloading';
+    window.api.downloadUpdate();
+  } else if (updateState === 'ready') {
+    window.api.installUpdate();
+  }
+});
+
+btnUpdateDismiss.addEventListener('click', () => {
+  updateBanner.style.display = 'none';
+});
+
+// Settings: Check for Updates button
+const btnCheckUpdates = document.getElementById('btnCheckUpdates');
+const updateStatusText = document.getElementById('updateStatusText');
+const appVersionText = document.getElementById('appVersionText');
+
+window.api.getAppVersion().then(v => {
+  if (appVersionText) appVersionText.textContent = 'v' + v;
+});
+
+if (btnCheckUpdates) {
+  let checkTimeout = null;
+
+  btnCheckUpdates.addEventListener('click', () => {
+    btnCheckUpdates.disabled = true;
+    btnCheckUpdates.textContent = 'Checking...';
+    updateStatusText.textContent = '';
+    updateStatusText.style.color = '#6a6a8a';
+    window.api.checkForUpdates();
+
+    // If nothing happens within 10s, assume up to date
+    checkTimeout = setTimeout(() => {
+      if (updateState === 'idle') {
+        updateStatusText.textContent = 'You\'re on the latest version!';
+        updateStatusText.style.color = '#4ade80';
+        btnCheckUpdates.disabled = false;
+        btnCheckUpdates.textContent = 'Check for Updates';
+      }
+    }, 10000);
+  });
+
+  // Hook into existing update events to also update Settings UI
+  window.api.onUpdateAvailable(() => {
+    if (checkTimeout) clearTimeout(checkTimeout);
+    btnCheckUpdates.disabled = false;
+    btnCheckUpdates.textContent = 'Check for Updates';
+    updateStatusText.textContent = 'New version available!';
+    updateStatusText.style.color = '#9146ff';
+  });
+
+  window.api.onUpdateError(() => {
+    if (checkTimeout) clearTimeout(checkTimeout);
+    btnCheckUpdates.disabled = false;
+    btnCheckUpdates.textContent = 'Check for Updates';
+    updateStatusText.textContent = 'Could not check for updates.';
+    updateStatusText.style.color = '#ff6b6b';
+  });
+}
+
 // ── DOM Elements ───────────────────────────────────────────────────────────
 const urlInput = document.getElementById('urlInput');
 const btnDownload = document.getElementById('btnDownload');

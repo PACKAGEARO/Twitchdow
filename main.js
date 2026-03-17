@@ -5,6 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
 const http = require('http');
+const { autoUpdater } = require('electron-updater');
 
 // ── Persistent Store ──────────────────────────────────────────────────────
 // Cross-platform data directory
@@ -1410,11 +1411,64 @@ function createWindow() {
   });
 }
 
+// ── Auto Updater ──────────────────────────────────────────────────────────
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+
+autoUpdater.on('update-available', (info) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-available', {
+      version: info.version,
+      releaseNotes: info.releaseNotes || '',
+    });
+  }
+});
+
+autoUpdater.on('download-progress', (progress) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-download-progress', {
+      percent: Math.round(progress.percent),
+    });
+  }
+});
+
+autoUpdater.on('update-downloaded', () => {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-downloaded');
+  }
+});
+
+autoUpdater.on('error', (err) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-error', err.message);
+  }
+});
+
+ipcMain.handle('check-for-updates', () => {
+  autoUpdater.checkForUpdates().catch(() => {});
+});
+
+ipcMain.handle('download-update', () => {
+  autoUpdater.downloadUpdate().catch(() => {});
+});
+
+ipcMain.handle('install-update', () => {
+  autoUpdater.quitAndInstall();
+});
+
+ipcMain.handle('get-app-version', () => {
+  return app.getVersion();
+});
+
 app.whenReady().then(() => {
   createWindow();
   startDiskWatcher();
   if (settings.autoDownloadFavorites) {
     startAutoDownloadPolling();
+  }
+  // Check for updates 5 seconds after launch (only in packaged app)
+  if (app.isPackaged) {
+    setTimeout(() => autoUpdater.checkForUpdates().catch(() => {}), 5000);
   }
 });
 

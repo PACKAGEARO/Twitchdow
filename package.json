@@ -7,9 +7,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/twitchdow/twitchdow"
+    "url": "https://github.com/PACKAGEARO/Twitchdow"
   },
-  "homepage": "https://github.com/twitchdow/twitchdow#readme",
+  "homepage": "https://github.com/PACKAGEARO/Twitchdow#readme",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
@@ -19,13 +19,21 @@
     "build:dir": "electron-builder --dir"
   },
   "dependencies": {
-    "electron-store": "^8.1.0"
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.8.3"
   },
   "devDependencies": {
     "electron": "^33.0.0",
     "electron-builder": "^25.1.8"
   },
   "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "PACKAGEARO",
+        "repo": "Twitchdow"
+      }
+    ],
     "appId": "com.twitchdow.app",
     "productName": "Twitchdow",
     "directories": {
